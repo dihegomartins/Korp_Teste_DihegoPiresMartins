@@ -32,3 +32,8 @@ func Connect() {
 
 	log.Println("✅ Conexão com SQL Server (KorpDB) estabelecida com sucesso!")
 }
+
+// GetDB retorna a instância de conexão com o banco de dados
+func GetDB() *sqlx.DB {
+    return DB
+}

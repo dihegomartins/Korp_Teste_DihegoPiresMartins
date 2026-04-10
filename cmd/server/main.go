@@ -42,6 +42,9 @@ func main() {
 	router.POST("/produtos", handlers.CriarProduto)
 	router.PATCH("/produtos/:id/baixa", handlers.BaixaEstoque)
 	
+	//Rota de Faturamento
+	router.POST("/faturamento", handlers.AbrirNotaFiscal)
+
 	// 4. Sobe o servidor na porta 8080
 	log.Println("🚀 Servidor rodando em http://localhost:8080")
 	router.Run(":8080")

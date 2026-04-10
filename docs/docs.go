@@ -15,6 +15,61 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/faturamento": {
+            "post": {
+                "description": "Cria uma nota fiscal, abate o estoque dos produtos e salva os itens em uma transação única.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "faturamento"
+                ],
+                "summary": "Abrir nova Nota Fiscal",
+                "parameters": [
+                    {
+                        "description": "Dados da Nota e Itens",
+                        "name": "nota",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/produtos": {
             "get": {
                 "description": "Retorna todos os produtos do banco de dados",
@@ -31,7 +86,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Produto"
+                                "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
                             }
                         }
                     }
@@ -56,7 +111,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Produto"
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
                         }
                     }
                 ],
@@ -64,7 +119,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Produto"
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
                         }
                     }
                 }
@@ -116,7 +171,45 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Produto": {
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "itens": {
+                    "description": "Para receber os itens no POST",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem"
+                    }
+                },
+                "numero_sequencial": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "nota_id": {
+                    "type": "integer"
+                },
+                "produto_id": {
+                    "type": "integer"
+                },
+                "quantidade": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto": {
             "type": "object",
             "properties": {
                 "codigo": {
