@@ -1,0 +1,81 @@
+definitions:
+  models.Produto:
+    properties:
+      codigo:
+        type: string
+      descricao:
+        type: string
+      id:
+        type: integer
+      saldo:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /produtos:
+    get:
+      description: Retorna todos os produtos do banco de dados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Produto'
+            type: array
+      summary: Listar produtos
+      tags:
+      - produtos
+    post:
+      consumes:
+      - application/json
+      description: Salva um novo produto no banco de dados
+      parameters:
+      - description: Dados do Produto
+        in: body
+        name: produto
+        required: true
+        schema:
+          $ref: '#/definitions/models.Produto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Produto'
+      summary: Cadastrar novo produto
+      tags:
+      - produtos
+  /produtos/{id}/baixa:
+    patch:
+      consumes:
+      - application/json
+      description: Subtrai uma quantidade do saldo de um produto específico
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Quantidade a subtrair (ex: {'
+        in: body
+        name: quantidade
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Dar baixa no estoque
+      tags:
+      - produtos
+swagger: "2.0"

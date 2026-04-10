@@ -54,7 +54,13 @@ func UpdateEstoque(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Estoque atualizado com sucesso!"})
 }
 
-// ListarProdutos devolve todos os produtos para o front-end
+// ListarProdutos godoc
+// @Summary      Listar produtos
+// @Description  Retorna todos os produtos do banco de dados
+// @Tags         produtos
+// @Produce      json
+// @Success      200  {array}  models.Produto
+// @Router       /produtos [get]
 func ListarProdutos(c *gin.Context) {
 	produtos, err := repository.GetAllProdutos()
 	if err != nil {
@@ -72,7 +78,16 @@ func ListarProdutos(c *gin.Context) {
 	c.JSON(http.StatusOK, produtos)
 }
 
-// CriarProduto lida com a requisição POST para novos produtos
+
+// CriarProduto godoc
+// @Summary      Cadastrar novo produto
+// @Description  Salva um novo produto no banco de dados
+// @Tags         produtos
+// @Accept       json
+// @Produce      json
+// @Param        produto  body      models.Produto  true  "Dados do Produto"
+// @Success      201      {object}  models.Produto
+// @Router       /produtos [post]
 func CriarProduto(c *gin.Context) {
 	var novoProduto models.Produto
 
@@ -93,7 +108,18 @@ func CriarProduto(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Produto cadastrado com sucesso!", "data": novoProduto})
 }
 
-// BaixaEstoque lida com a retirada de itens do inventário
+
+
+// BaixaEstoque godoc
+// @Summary      Dar baixa no estoque
+// @Description  Subtrai uma quantidade do saldo de um produto específico
+// @Tags         produtos
+// @Accept       json
+// @Produce      json
+// @Param        id          path      int  true  "ID do Produto"
+// @Param        quantidade  body      object  true  "Quantidade a subtrair (ex: {"quantidade": 10})"
+// @Success      200         {object}  map[string]string
+// @Router       /produtos/{id}/baixa [patch]
 func BaixaEstoque(c *gin.Context) {
 	idStr := c.Param("id")
 	var id int

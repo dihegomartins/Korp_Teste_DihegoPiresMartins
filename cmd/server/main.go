@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 
+	_ "github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/docs"
 	"github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/internal/database"
 	"github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/internal/handlers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -26,6 +29,8 @@ func main() {
 
 
 	// Rota de teste: Ver se a API está viva
+	// Rota da documentação
+    router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "API de Estoque está online! 🚀",
