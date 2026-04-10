@@ -30,3 +30,9 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Angular
+node_modules/
+dist/
+.angular/
+.vscode/
