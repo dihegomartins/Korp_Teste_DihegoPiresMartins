@@ -1,20 +1,21 @@
 definitions:
-  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal:
+  models.NotaFiscal:
     properties:
       id:
         type: integer
       itens:
-        description: Para receber os itens no POST
         items:
-          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem'
+          $ref: '#/definitions/models.NotaFiscalItem'
         type: array
       numero_sequencial:
         type: integer
       status:
         type: string
     type: object
-  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem:
+  models.NotaFiscalItem:
     properties:
+      descricao_produto:
+        type: string
       id:
         type: integer
       nota_id:
@@ -24,7 +25,7 @@ definitions:
       quantidade:
         type: integer
     type: object
-  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto:
+  models.Produto:
     properties:
       codigo:
         type: string
@@ -39,6 +40,20 @@ info:
   contact: {}
 paths:
   /faturamento:
+    get:
+      description: Retorna o histórico de notas fiscais com seus itens
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.NotaFiscal'
+            type: array
+      summary: Listar todas as notas
+      tags:
+      - faturamento
     post:
       consumes:
       - application/json
@@ -50,7 +65,7 @@ paths:
         name: nota
         required: true
         schema:
-          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal'
+          $ref: '#/definitions/models.NotaFiscal'
       produces:
       - application/json
       responses:
@@ -75,6 +90,25 @@ paths:
       summary: Abrir nova Nota Fiscal
       tags:
       - faturamento
+  /faturamento/{id}/fechar:
+    patch:
+      description: Atualiza o status para Fechada e deduz o estoque dos produtos
+      parameters:
+      - description: ID da Nota Fiscal
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Fechar e Imprimir Nota Fiscal
+      tags:
+      - faturamento
   /produtos:
     get:
       description: Retorna todos os produtos do banco de dados
@@ -85,7 +119,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
+              $ref: '#/definitions/models.Produto'
             type: array
       summary: Listar produtos
       tags:
@@ -100,14 +134,14 @@ paths:
         name: produto
         required: true
         schema:
-          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
+          $ref: '#/definitions/models.Produto'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
+            $ref: '#/definitions/models.Produto'
       summary: Cadastrar novo produto
       tags:
       - produtos

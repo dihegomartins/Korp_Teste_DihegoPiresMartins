@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/internal/database"
 	"github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/internal/models"
@@ -45,4 +46,46 @@ func AbrirNotaFiscal(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Nota Fiscal nº " + string(rune(nf.NumeroSequencial)) + " aberta com sucesso e estoque atualizado!",
 	})
+}
+
+// ListarNotas godoc
+// @Summary      Listar todas as notas
+// @Description  Retorna o histórico de notas fiscais com seus itens
+// @Tags         faturamento
+// @Produce      json
+// @Success      200  {array}  models.NotaFiscal
+// @Router       /faturamento [get]
+func ListarNotas(c *gin.Context) {
+	db := database.GetDB()
+	repo := repository.NewFaturamentoRepository(db)
+
+	notas, err := repo.ListarNotas()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao listar notas: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, notas)
+}
+
+
+// FecharNota godoc
+// @Summary      Fechar e Imprimir Nota Fiscal
+// @Description  Atualiza o status para Fechada e deduz o estoque dos produtos 
+// @Tags         faturamento
+// @Param        id   path      int  true  "ID da Nota Fiscal"
+// @Success      200  {object}  map[string]string
+// @Router       /faturamento/{id}/fechar [patch]
+func FecharNota(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	db := database.GetDB()
+	repo := repository.NewFaturamentoRepository(db)
+
+	err := repo.FecharNotaFiscal(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Nota finalizada e estoque atualizado com sucesso!"})
 }

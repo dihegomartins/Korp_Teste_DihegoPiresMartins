@@ -16,6 +16,27 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/faturamento": {
+            "get": {
+                "description": "Retorna o histórico de notas fiscais com seus itens",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "faturamento"
+                ],
+                "summary": "Listar todas as notas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.NotaFiscal"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Cria uma nota fiscal, abate o estoque dos produtos e salva os itens em uma transação única.",
                 "consumes": [
@@ -35,7 +56,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal"
+                            "$ref": "#/definitions/models.NotaFiscal"
                         }
                     }
                 ],
@@ -70,6 +91,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/faturamento/{id}/fechar": {
+            "patch": {
+                "description": "Atualiza o status para Fechada e deduz o estoque dos produtos",
+                "tags": [
+                    "faturamento"
+                ],
+                "summary": "Fechar e Imprimir Nota Fiscal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Nota Fiscal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/produtos": {
             "get": {
                 "description": "Retorna todos os produtos do banco de dados",
@@ -86,7 +136,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
+                                "$ref": "#/definitions/models.Produto"
                             }
                         }
                     }
@@ -111,7 +161,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
+                            "$ref": "#/definitions/models.Produto"
                         }
                     }
                 ],
@@ -119,7 +169,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
+                            "$ref": "#/definitions/models.Produto"
                         }
                     }
                 }
@@ -171,17 +221,16 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal": {
+        "models.NotaFiscal": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
                 },
                 "itens": {
-                    "description": "Para receber os itens no POST",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem"
+                        "$ref": "#/definitions/models.NotaFiscalItem"
                     }
                 },
                 "numero_sequencial": {
@@ -192,9 +241,12 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem": {
+        "models.NotaFiscalItem": {
             "type": "object",
             "properties": {
+                "descricao_produto": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -209,7 +261,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto": {
+        "models.Produto": {
             "type": "object",
             "properties": {
                 "codigo": {

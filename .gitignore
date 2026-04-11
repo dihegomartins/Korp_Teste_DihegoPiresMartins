@@ -36,3 +36,12 @@ node_modules/
 dist/
 .angular/
 .vscode/
+
+# Ignorar configurações sensíveis
+backend/.env
+
+# Ignorar dependências do Frontend (que criaremos amanhã)
+frontend/node_modules/
+
+# Ignorar executáveis do Go
+backend/server

@@ -15,7 +15,7 @@ import (
 
 func main() {
 	// 1. Carrega o arquivo .env
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Erro ao carregar o arquivo .env")
 	}
@@ -44,7 +44,9 @@ func main() {
 	
 	//Rota de Faturamento
 	router.POST("/faturamento", handlers.AbrirNotaFiscal)
-
+	router.GET("/faturamento", handlers.ListarNotas)
+	router.PATCH("/faturamento/:id/fechar", handlers.FecharNota)
+	
 	// 4. Sobe o servidor na porta 8080
 	log.Println("🚀 Servidor rodando em http://localhost:8080")
 	router.Run(":8080")
