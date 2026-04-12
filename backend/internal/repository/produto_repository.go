@@ -8,6 +8,7 @@ import (
 	"github.com/dihegomartins/Korp_Teste_DihegoPiresMartins/internal/models"
 )
 
+// GetProdutoByCodigo busca um produto pelo SKU
 func GetProdutoByCodigo(codigo string) (*models.Produto, error) {
 	var produto models.Produto
 	query := "SELECT Id, Codigo, Descricao, Saldo FROM Produtos WHERE Codigo = @p1"
@@ -19,7 +20,7 @@ func GetProdutoByCodigo(codigo string) (*models.Produto, error) {
 	return &produto, nil
 }
 
-// Essencial para a baixa de estoque (ESCRITA)
+// UpdateSaldo define um valor absoluto para o saldo
 func UpdateSaldo(id int, novoSaldo int) error {
 	query := "UPDATE Produtos SET Saldo = @p1 WHERE Id = @p2"
 	
@@ -31,7 +32,7 @@ func UpdateSaldo(id int, novoSaldo int) error {
 	return nil
 }
 
-// Útil para listagens (LEITURA)
+// GetAllProdutos lista todos os produtos cadastrados
 func GetAllProdutos() ([]models.Produto, error) {
 	var produtos []models.Produto
 	query := "SELECT Id, Codigo, Descricao, Saldo FROM Produtos"
@@ -40,10 +41,10 @@ func GetAllProdutos() ([]models.Produto, error) {
 	return produtos, err
 }
 
-// CreateProduto insere um novo produto no banco de dados
+// CreateProduto insere um novo produto
 func CreateProduto(p models.Produto) error {
 	query := `INSERT INTO Produtos (Codigo, Descricao, Saldo) 
-              VALUES (@p1, @p2, @p3)`
+			  VALUES (@p1, @p2, @p3)`
 	
 	_, err := database.DB.Exec(query, p.Codigo, p.Descricao, p.Saldo)
 	if err != nil {
@@ -53,9 +54,8 @@ func CreateProduto(p models.Produto) error {
 	return nil
 }
 
-// SubtrairSaldo reduz a quantidade do produto no banco
+// SubtrairSaldo reduz a quantidade (usado no faturamento)
 func SubtrairSaldo(id int, quantidadeParaSubtrair int) error {
-	// A query subtrai do saldo atual. O "WHERE Saldo >= @p1" evita que o estoque fique negativo no banco
 	query := `UPDATE Produtos SET Saldo = Saldo - @p1 WHERE Id = @p2 AND Saldo >= @p1`
 	
 	result, err := database.DB.Exec(query, quantidadeParaSubtrair, id)
@@ -63,10 +63,30 @@ func SubtrairSaldo(id int, quantidadeParaSubtrair int) error {
 		return err
 	}
 
-	// Verifica se alguma linha foi afetada (se o saldo era insuficiente, o SQL não atualiza nada)
 	rows, _ := result.RowsAffected()
 	if rows == 0 {
 		return fmt.Errorf("saldo insuficiente ou produto não encontrado")
+	}
+
+	return nil
+}
+
+// --- ESSA É A NOVA FUNÇÃO QUE VOCÊ PRECISAVA ---
+
+// AdicionarSaldo incrementa a quantidade atual (Reposicão de estoque)
+func AdicionarSaldo(id int, quantidadeParaAdicionar int) error {
+	// Aqui fazemos Saldo = Saldo + Valor para não perder o que já tem lá
+	query := `UPDATE Produtos SET Saldo = Saldo + @p1 WHERE Id = @p2`
+	
+	result, err := database.DB.Exec(query, quantidadeParaAdicionar, id)
+	if err != nil {
+		log.Printf("Erro ao adicionar saldo: %v", err)
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("produto com ID %d não encontrado para reposição", id)
 	}
 
 	return nil

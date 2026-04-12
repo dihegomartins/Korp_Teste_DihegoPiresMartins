@@ -45,3 +45,22 @@ frontend/node_modules/
 
 # Ignorar executáveis do Go
 backend/server
+
+# Executáveis específicos dos serviços
+faturamento
+estoque
+faturamento_service
+estoque_service
+
+# Logs e arquivos temporários
+*.log
+tmp/
+
+# Executáveis gerados pelo Go (dentro de cmd/)
+backend/cmd/estoque/estoque
+backend/cmd/estoque/estoque.exe
+backend/cmd/faturamento/faturamento
+backend/cmd/faturamento/faturamento.exe
+
+# Regra geral para qualquer executável
+*.exe

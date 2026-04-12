@@ -1,18 +1,18 @@
 definitions:
-  models.NotaFiscal:
+  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal:
     properties:
       id:
         type: integer
       itens:
         items:
-          $ref: '#/definitions/models.NotaFiscalItem'
+          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem'
         type: array
       numero_sequencial:
         type: integer
       status:
         type: string
     type: object
-  models.NotaFiscalItem:
+  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem:
     properties:
       descricao_produto:
         type: string
@@ -25,7 +25,7 @@ definitions:
       quantidade:
         type: integer
     type: object
-  models.Produto:
+  github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto:
     properties:
       codigo:
         type: string
@@ -49,7 +49,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.NotaFiscal'
+              $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal'
             type: array
       summary: Listar todas as notas
       tags:
@@ -65,7 +65,7 @@ paths:
         name: nota
         required: true
         schema:
-          $ref: '#/definitions/models.NotaFiscal'
+          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal'
       produces:
       - application/json
       responses:
@@ -119,7 +119,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Produto'
+              $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
             type: array
       summary: Listar produtos
       tags:
@@ -134,15 +134,44 @@ paths:
         name: produto
         required: true
         schema:
-          $ref: '#/definitions/models.Produto'
+          $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.Produto'
+            $ref: '#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto'
       summary: Cadastrar novo produto
+      tags:
+      - produtos
+  /produtos/{id}/adicionar:
+    patch:
+      consumes:
+      - application/json
+      description: Soma uma quantidade ao saldo atual de um produto específico
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Quantidade a adicionar (ex: {'
+        in: body
+        name: quantidade
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reposição de estoque
       tags:
       - produtos
   /produtos/{id}/baixa:

@@ -31,7 +31,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.NotaFiscal"
+                                "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal"
                             }
                         }
                     }
@@ -56,7 +56,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.NotaFiscal"
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal"
                         }
                     }
                 ],
@@ -136,7 +136,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Produto"
+                                "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
                             }
                         }
                     }
@@ -161,7 +161,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Produto"
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
                         }
                     }
                 ],
@@ -169,7 +169,51 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Produto"
+                            "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto"
+                        }
+                    }
+                }
+            }
+        },
+        "/produtos/{id}/adicionar": {
+            "patch": {
+                "description": "Soma uma quantidade ao saldo atual de um produto específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "produtos"
+                ],
+                "summary": "Reposição de estoque",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Produto",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Quantidade a adicionar (ex: {",
+                        "name": "quantidade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -221,7 +265,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.NotaFiscal": {
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscal": {
             "type": "object",
             "properties": {
                 "id": {
@@ -230,7 +274,7 @@ const docTemplate = `{
                 "itens": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.NotaFiscalItem"
+                        "$ref": "#/definitions/github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem"
                     }
                 },
                 "numero_sequencial": {
@@ -241,7 +285,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.NotaFiscalItem": {
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.NotaFiscalItem": {
             "type": "object",
             "properties": {
                 "descricao_produto": {
@@ -261,7 +305,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Produto": {
+        "github_com_dihegomartins_Korp_Teste_DihegoPiresMartins_internal_models.Produto": {
             "type": "object",
             "properties": {
                 "codigo": {

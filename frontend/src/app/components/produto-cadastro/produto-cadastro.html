@@ -1,0 +1,119 @@
+<div class="d-flex justify-content-end mb-3">
+  <button
+    type="button"
+    class="btn btn-success shadow-sm fw-bold"
+    data-bs-toggle="modal"
+    data-bs-target="#modalEntrada"
+  >
+    <i class="bi bi-plus-lg me-2"></i>Nova Entrada de Estoque
+  </button>
+</div>
+
+<div
+  class="modal fade"
+  id="modalEntrada"
+  tabindex="-1"
+  aria-labelledby="modalEntradaLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="modalEntradaLabel">📦 Movimentação de Produto</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+          <li class="nav-item">
+            <button
+              class="nav-link active fw-bold"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-novo"
+            >
+              Novo Cadastro
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#pills-repor">
+              Repor Saldo
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content border-0">
+          <div class="tab-pane fade show active" id="pills-novo">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary text-uppercase"
+                >SKU / Código</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="novoProd.codigo"
+                placeholder="Ex: BEB-001"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary text-uppercase"
+                >Descrição</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="novoProd.descricao"
+                placeholder="Ex: Cerveja Gelada"
+              />
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-secondary text-uppercase"
+                >Saldo Inicial</label
+              >
+              <input type="number" class="form-control" [(ngModel)]="novoProd.saldo" />
+            </div>
+            <button class="btn btn-success w-100 fw-bold py-2" (click)="cadastrarNovo()">
+              <i class="bi bi-check-lg me-1"></i> Gravar Cadastro
+            </button>
+          </div>
+
+          <div class="tab-pane fade" id="pills-repor">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-primary text-uppercase"
+                >Selecione o Produto</label
+              >
+              <select class="form-select border-primary" [(ngModel)]="idProduto">
+                <option [ngValue]="null" disabled selected>Escolha um produto da lista...</option>
+                <option *ngFor="let p of listaProdutos" [ngValue]="p.id">
+                  {{ p.descricao }} (SKU: {{ p.codigo }})
+                </option>
+              </select>
+              <div class="form-text mt-1" *ngIf="listaProdutos.length === 0">
+                Nenhum produto cadastrado.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-primary text-uppercase"
+                >Quantidade a Adicionar</label
+              >
+              <input
+                type="number"
+                class="form-control border-primary"
+                [(ngModel)]="quantidadeParaSomar"
+                placeholder="0"
+              />
+            </div>
+
+            <button class="btn btn-primary w-100 fw-bold py-2" (click)="executarReposicao()">
+              <i class="bi bi-plus-circle me-1"></i> Somar ao Estoque Atual
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

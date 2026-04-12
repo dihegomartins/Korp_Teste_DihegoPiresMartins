@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,80 +12,107 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AbrirNotaFiscal godoc
-// @Summary      Abrir nova Nota Fiscal
-// @Description  Cria uma nota fiscal, abate o estoque dos produtos e salva os itens em uma transação única.
-// @Tags         faturamento
-// @Accept       json
-// @Produce      json
-// @Param        nota  body      models.NotaFiscal  true  "Dados da Nota e Itens"
-// @Success      201   {object}  map[string]string
-// @Failure      400   {object}  map[string]string
-// @Failure      500   {object}  map[string]string
-// @Router       /faturamento [post]
+// AbrirNotaFiscal com validações de campos obrigatórios
 func AbrirNotaFiscal(c *gin.Context) {
 	var nf models.NotaFiscal
-
-	// 1. Faz o Bind do JSON enviado pelo Angular/Insonmia
 	if err := c.ShouldBindJSON(&nf); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados da nota inválidos: " + err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de dados inválido: " + err.Error()})
 		return
 	}
 
-	// 2. Instancia o repositório (usando a conexão global que você já tem no database.go)
+	// [Validação Obrigatória] Verifica numeração sequencial
+	if nf.NumeroSequencial <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "A Numeração Sequencial é obrigatória e deve ser maior que zero"})
+		return
+	}
+
+	// [Regra de Negócio] Garante status inicial como "Aberta"
+	nf.Status = "Aberta"
+
 	db := database.GetDB()
 	repo := repository.NewFaturamentoRepository(db)
-
-	// 3. Chama a função de transação que criamos no repositório
+	
 	err := repo.CriarNotaFiscalCompleta(nf)
 	if err != nil {
-		// Se der erro (ex: falta de estoque), a transação já deu Rollback lá no repo
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao persistir nota fiscal: " + err.Error()})
 		return
 	}
 
-	// 4. Retorno de sucesso
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Nota Fiscal nº " + string(rune(nf.NumeroSequencial)) + " aberta com sucesso e estoque atualizado!",
+		"message": fmt.Sprintf("Nota Fiscal nº %d criada com sucesso (Status: Aberta)!", nf.NumeroSequencial),
 	})
 }
 
-// ListarNotas godoc
-// @Summary      Listar todas as notas
-// @Description  Retorna o histórico de notas fiscais com seus itens
-// @Tags         faturamento
-// @Produce      json
-// @Success      200  {array}  models.NotaFiscal
-// @Router       /faturamento [get]
 func ListarNotas(c *gin.Context) {
 	db := database.GetDB()
 	repo := repository.NewFaturamentoRepository(db)
-
 	notas, err := repo.ListarNotas()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao listar notas: " + err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, notas)
 }
 
-
-// FecharNota godoc
-// @Summary      Fechar e Imprimir Nota Fiscal
-// @Description  Atualiza o status para Fechada e deduz o estoque dos produtos 
-// @Tags         faturamento
-// @Param        id   path      int  true  "ID da Nota Fiscal"
-// @Success      200  {object}  map[string]string
-// @Router       /faturamento/{id}/fechar [patch]
 func FecharNota(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	db := database.GetDB()
 	repo := repository.NewFaturamentoRepository(db)
 
-	err := repo.FecharNotaFiscal(id)
+	nota, err := repo.BuscarNotaPorID(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Nota fiscal não encontrada"})
+		return
+	}
+
+	if nota.Status != "Aberta" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Apenas notas com status Aberta podem ser fechadas/impressas"})
+		return
+	}
+
+	client := &http.Client{}
+	for _, item := range nota.Itens {
+		url := fmt.Sprintf("http://127.0.0.1:8081/produtos/%d/baixa", item.ProdutoId)
+		
+		req, err := http.NewRequest(http.MethodPatch, url, nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro interno ao preparar comunicação com estoque"})
+			return
+		}
+
+		req.Header.Set("X-Quantidade-Baixa", strconv.Itoa(item.Quantidade))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(req)
+
+		if err != nil {
+			fmt.Printf("❌ Falha de conexão: %v\n", err)
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Falha na integração: O microsserviço de estoque está offline."})
+			return
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			var bodyErr struct {
+				Error string `json:"error"`
+			}
+			json.NewDecoder(resp.Body).Decode(&bodyErr)
+			
+			mensagemFinal := bodyErr.Error
+			if mensagemFinal == "" {
+				mensagemFinal = "Erro desconhecido no microsserviço de estoque."
+			}
+
+			c.JSON(resp.StatusCode, gin.H{
+				"error": "Integração Rejeitada: " + mensagemFinal,
+			})
+			return
+		}
+	}
+
+	err = repo.FecharNotaFiscal(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao atualizar status final: " + err.Error()})
 		return
 	}
 
