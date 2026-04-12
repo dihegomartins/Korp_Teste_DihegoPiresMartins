@@ -13,9 +13,11 @@ Este projeto é uma solução de microserviços para controle de estoque e fatur
 
 ### Frontend
 
-- **Angular 17+**: Framework para a interface do usuário (Standalone Components).
+- **Angular 21**: Framework moderno para a interface do usuário (Standalone Components).
+- **TypeScript 5.9**: Tipagem estática e produtividade.
 - **Bootstrap / Bootstrap Icons**: Estilização e componentes visuais.
-- **RxJS**: Programação reativa para chamadas de API.
+- **RxJS 7.8**: Programação reativa para chamadas de API.
+- **Vitest**: Framework de testes unitários.
 
 ---
 

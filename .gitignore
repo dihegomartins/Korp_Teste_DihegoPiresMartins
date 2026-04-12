@@ -1,6 +1,3 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -17,50 +14,34 @@ coverage.*
 *.coverprofile
 profile.cov
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
 # Go workspace file
 go.work
 go.work.sum
 
-# env file
+# env files (Segurança: não subir senhas)
 .env
+backend/.env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.vscode/
+.idea/
 
 # Angular
 node_modules/
 dist/
 .angular/
-.vscode/
-
-# Ignorar configurações sensíveis
-backend/.env
-
-# Ignorar dependências do Frontend (que criaremos amanhã)
 frontend/node_modules/
 
-# Ignorar executáveis do Go
-backend/server
+# --- REGRAS ESPECÍFICAS DO BACKEND ---
 
-# Executáveis específicos dos serviços
-faturamento
-estoque
-faturamento_service
-estoque_service
-
-# Logs e arquivos temporários
-*.log
-tmp/
-
-# Executáveis gerados pelo Go (dentro de cmd/)
+# Ignorar apenas os EXECUTÁVEIS gerados pelo Go
+# (Isso permite que as pastas 'estoque' e 'faturamento' subam, mas os arquivos .exe fiquem de fora)
 backend/cmd/estoque/estoque
 backend/cmd/estoque/estoque.exe
 backend/cmd/faturamento/faturamento
 backend/cmd/faturamento/faturamento.exe
+backend/server
 
-# Regra geral para qualquer executável
-*.exe
+# Logs e arquivos temporários
+*.log
+tmp/
