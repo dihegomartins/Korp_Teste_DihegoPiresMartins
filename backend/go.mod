@@ -3,7 +3,6 @@ module github.com/dihegomartins/Korp_Teste_DihegoPiresMartins
 go 1.26.2
 
 require (
-	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
